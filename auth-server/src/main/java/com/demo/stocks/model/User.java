@@ -1,19 +1,19 @@
 package com.demo.stocks.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.json.JSONObject;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+
+    public User get() {return this;}
 
     public int getId() {
         return this.id;
@@ -111,6 +111,16 @@ public class User implements UserDetails {
     @NotEmpty(message="Password cannot be empty")
     @Size(min = 8, message = "Password should have at least 8 characters")
     private String password;
+
+    private Date creationTime;
+
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
+    }
 
     private static final String DELIMITER = " - ";
 

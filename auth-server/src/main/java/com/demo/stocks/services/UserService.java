@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class UserService {
 
@@ -20,8 +22,9 @@ public class UserService {
     private UserRepository userRepository;
     private BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 
-    public boolean isValidEmail(String email) throws Exception {
+    public boolean isValidEmail(String email) {
         var user = this.userRepository.findByEmail(email);
+        System.out.println("Returned: " + user);
         return user == null;
     }
 
@@ -33,18 +36,18 @@ public class UserService {
         return user;
     }
 
-    public HttpStatus authenticateUser(int id, String password) throws UserNotFoundException, IncorrectPasswordException {
+    public User authenticateUser(String email, String password) throws UserNotFoundException, IncorrectPasswordException {
 
         // Get user from DB.
-        User user = this.userRepository.findById(id);
+        User user = this.userRepository.findByEmail(email);
         if (user == null)
-            throw new UserNotFoundException(String.format("%s%d", ErrorMessage.USER_DOES_NOT_EXIST, id));
+            throw new UserNotFoundException(String.format("%s%s", ErrorMessage.USER_DOES_NOT_EXIST, email));
 
         // Check password.
         if (!bcrypt.matches(password, user.getPassword()))
             throw new IncorrectPasswordException("The password you entered is incorrect");
 
-        return HttpStatus.OK;
+        return user;
     }
 
     public UserDTO getUser(int id) throws UserNotFoundException {
@@ -53,15 +56,14 @@ public class UserService {
         return new UserDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail());
     }
 
-    public HttpStatus saveUser(User user) throws Exception {
+    public User saveUser(User user) throws UserAlreadyExistsException {
         boolean isValid = this.isValidEmail(user.getEmail());
         if (!isValid)
             throw new UserAlreadyExistsException(ErrorMessage.USER_EXISTS);
 
+        user.setCreationTime(new Date());
         user.setPassword(bcrypt.encode(user.getPassword()));
-        this.userRepository.save(user);
-
-        return HttpStatus.OK;
+        return this.userRepository.save(user);
     }
 
     public HttpStatus updateUser(int id, UserDetail detail, String newEntry) throws UserNotFoundException {
