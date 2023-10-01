@@ -2,6 +2,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
+import Store from './context/userContext'
+import UserProvider from './context/userContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,7 +22,9 @@ export default function RootLayout({
       <Head>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
       </Head>
-      <body className={inter.className + " bg-blue text-white"}>{children}</body>
+      <body className={inter.className + " bg-blue text-white"}>
+        <UserProvider>{children}</UserProvider>
+      </body>
     </html>
   )
 }

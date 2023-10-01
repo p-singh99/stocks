@@ -4,13 +4,10 @@ public class JwtResponse {
 
     private String token;
     private String type = "Bearer";
-    private String refreshToken;
     private int userId;
     private String email;
 
-    public JwtResponse(String accessToken, String refreshToken, int id, String email) {
-        this.token = accessToken;
-        this.refreshToken = refreshToken;
+    public JwtResponse(int id, String email) {
         this.userId = id;
         this.email = email;
     }
@@ -29,14 +26,6 @@ public class JwtResponse {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     public int getUserId() {

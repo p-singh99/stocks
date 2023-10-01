@@ -19,6 +19,7 @@ module.exports = {
         'grey-form': '#8c8c8d',
         'blue-url': '#516bcd',
         'text-input': '#1b1a38',
+        'error-red': '#ff0000',
       }
     },
     screens: {

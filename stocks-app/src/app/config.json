@@ -1,0 +1,5 @@
+{
+    "auth-server-base": "http://localhost:8080",
+    "signup-endpoint": "/auth/signup",
+    "login-endpoint": "/auth"
+}

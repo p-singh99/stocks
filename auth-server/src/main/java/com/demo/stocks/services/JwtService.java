@@ -7,8 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 
-import com.demo.stocks.model.User;
-import org.springframework.http.ResponseCookie;
+import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +19,9 @@ public class JwtService {
 
     @Value("${stocks.app.jwtExpiry}")
     private int jwtExpiry;
+
+    @Value("${stocks.app.jwtCookieName}")
+    private String jwtCookieName;
 
     public boolean validateJwtToken(String token) {
         try {
@@ -37,14 +39,20 @@ public class JwtService {
         return false;
     }
 
-    public String generateJwtToken(String username) {
+    public Cookie generateJwtToken(String username) {
         Date issueTime = new Date();
-        return Jwts.builder()
+
+        Cookie cookie = new Cookie(jwtCookieName,
+                Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(issueTime)
                 .setExpiration(new Date(issueTime.getTime() + this.jwtExpiry))
                 .signWith(key(), SignatureAlgorithm.HS256)
-                .compact();
+                .compact());
+        cookie.setMaxAge(jwtExpiry);
+//        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        return cookie;
     }
 
     private Key key() {
