@@ -1,43 +1,42 @@
-import { 
-    Button, 
-    Drawer, 
-    DrawerCloseButton, 
-    DrawerContent, 
-    DrawerHeader, 
-    DrawerOverlay,
-    DrawerBody, 
-    VStack,
-    Divider,
-    Stack,
-} from "@chakra-ui/react";
-import { Pages, PageIcons } from "./pages";
+import React from 'react'
+import {
+  Button,
+  Drawer,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerBody,
+  VStack
+} from '@chakra-ui/react'
+import { Pages } from './pages'
 
 interface SidebarProps {
-    isOpen: boolean,
-    onClose: () => void,
+  isOpen: boolean
+  onClose: () => void
 }
 
-const SidebarContent = () => {
+const SidebarContent = (): React.JSX.Element => {
+  const sidebarItems = Object.values(Pages)
 
-    const sidebarItems = Object.values(Pages);
-
-    return (
+  return (
         <VStack spacing='1em' height='100%' justifyContent='center' alignItems="left">
             {sidebarItems.map((item) => {
-            return (
-                <Button w='100%' bg='none' color='white' _hover={{ bg: 'blue.300' }} textAlign={"left"}>
+              return (
+                <Button key={item} w='100%' bg='none' color='white' _hover={{ bg: 'blue.300' }} textAlign={'left'}>
                     {item}
                 </Button>
-            )})}
-        </VStack>   
-    )
+              )
+            })}
+        </VStack>
+  )
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-    return (
-        <Drawer 
-            isOpen={isOpen} 
-            placement="left" 
+const Sidebar = ({ isOpen, onClose }: SidebarProps): React.JSX.Element => {
+  return (
+        <Drawer
+            isOpen={isOpen}
+            placement="left"
             onClose={onClose}
         >
             <DrawerOverlay>
@@ -50,5 +49,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </DrawerContent>
             </DrawerOverlay>
         </Drawer>
-    )
+  )
 }
+
+export default Sidebar

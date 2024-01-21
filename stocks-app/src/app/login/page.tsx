@@ -1,97 +1,90 @@
 'use client'
 
-import { StatusCodes } from "http-status-codes";
-import Image from "next/image";
-import Logo from "../assets/images/logo.svg";
-import TextInput from "../components/TextInput";
-import Button from "../components/Button";
-import Link from "next/link";
-import { useState, useEffect, useContext } from "react";
-import Validator from "../utilities/inputValidator";
-import LoginConstants from "../constants/loginConstants";
-import axios from "axios";
-import config from "../config.json";
-import { useRouter } from "next/navigation";
-import { UserContext } from "../context/userContext";
-import { useCookies } from "react-cookie";
-import { UserAuthenticationResponse } from "../interfaces/UserAuthenticationResponse";
+import React, { useState, useContext } from 'react'
+import { StatusCodes } from 'http-status-codes'
+import Image from 'next/image'
+import Logo from '../assets/images/logo.svg'
+import TextInput from '../components/TextInput'
+import Button from '../components/Button'
+import Link from 'next/link'
 
-interface loginResponse {
-    userId: number,
-    firstName: string,
-    lastName: string,
-    email: string,
-}
+import { isValidEmail, isEmptyString } from '../utilities/inputValidator'
+import { emailError, userNotFoundError, networkError, incorrectPasswordError } from '../constants/loginConstants'
+import axios from 'axios'
+import config from '../config.json'
+import { useRouter } from 'next/navigation'
+import { UserContext } from '../context/userContext'
+import { useCookies } from 'react-cookie'
+import { type UserAuthenticationResponse } from '../interfaces/UserAuthenticationResponse'
 
-export default function Login() {
+const Login = (): React.JSX.Element => {
+  const [error, setError] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
+  const userContext = useContext(UserContext)
+  const [, setCookie] = useCookies(['user'])
 
-    const [error, setError] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const router = useRouter();
-    const userContext = useContext(UserContext);
-    const [ cookies, setCookie ] = useCookies(['user']);
+  const emailHandler = (email: string): void => {
+    setEmail(email)
+    !isValidEmail(email) ? setError(emailError) : setError('')
+  }
 
-    const emailHandler = (email: string): void => {
-        setEmail(email);
-        !Validator.isValidEmail(email) ? setError(LoginConstants.emailError) : setError("");
+  const isValidInputs = (): boolean => {
+    if (isEmptyString(email) || isEmptyString(password)) {
+      setError('Please enter all the fields')
+      return false
     }
+    return true
+  }
 
-    const isValidInputs = (): boolean => {
-        if (Validator.isEmptyString(email) || Validator.isEmptyString(password)) {
-            setError("Please enter all the fields");
-            return false;
-        }
-        return true;
+  const loginHandler = async (): Promise<void> => {
+    if (error === '' && isValidInputs()) {
+      await axios
+        .post(config['auth-server-base'] + config['login-endpoint'],
+          {
+            email,
+            password
+          },
+          {
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'Application/json'
+            },
+            withCredentials: true
+          }).then((response) => {
+          if (response.status === StatusCodes.OK) {
+            const responseData: UserAuthenticationResponse = response.data
+            userContext?.setUser({
+              id: Number(responseData.id),
+              firstName: responseData.firstName,
+              lastName: responseData.lastName,
+              email: responseData.email
+            })
+
+            userContext?.setLoggedIn(true)
+            setCookie('user', responseData.id)
+
+            router.push('/home')
+          }
+        }).catch((error) => {
+          if (error.response.status === StatusCodes.NOT_FOUND) {
+            setError(userNotFoundError)
+          } else if (error.response.status === StatusCodes.UNAUTHORIZED) {
+            setError(incorrectPasswordError)
+          } else {
+            setError(networkError)
+          }
+        })
     }
+  }
 
-    const loginHandler = async () => {
-        if (error === "" && isValidInputs()) {
-            const res = await axios
-                .post(config["auth-server-base"] + config["login-endpoint"], 
-                {
-                    email: email,
-                    password: password
-                },
-                {
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "Application/json",
-                    },
-                    withCredentials: true
-                }).then((response) => {
-                    if (response.status == StatusCodes.OK) {
-                        const responseData: UserAuthenticationResponse = response.data;
-                        userContext?.setUser({
-                            id: Number(responseData.id),
-                            firstName: responseData.firstName,
-                            lastName: responseData.lastName,
-                            email: responseData.email,
-                        });
-
-                        userContext?.setLoggedIn(true);
-                        setCookie('user', responseData.id);
-
-                        router.push("/home");
-                    }
-                }).catch((error) => {
-                    if (error.response.status == StatusCodes.NOT_FOUND) {
-                        setError(LoginConstants.userNotFoundError);
-                    } else if (error.response.status == StatusCodes.UNAUTHORIZED) {
-                        setError(LoginConstants.incorrectPasswordError);
-                    } else if (!error.status) {
-                        setError(LoginConstants.networkError);
-                    }
-                })
-        }
-    }
-
-    return (
+  return (
         <div className="flex items-center h-screen justify-center bg-blue">
             <div className="flex text-base flex-1 sm:mx-0 lg:mx-10 xl:mx-20 2xl:mx-10 justify-center">
                 <div className="max-w-xl bg-blue-darkest flex-1 flex flex-col gap-y-8 pt-20 items-center rounded-l-3xl sm:rounded-r-3xl md:rounded-r-3xl">
-                    <Image 
-                        src={Logo} 
+                    <Image
+                        src={Logo}
                         alt="logo"
                         width={75}
                         height={75}
@@ -128,5 +121,7 @@ export default function Login() {
                 </div>
             </div>
         </div>
-    )
-  }
+  )
+}
+
+export default Login

@@ -1,108 +1,107 @@
 'use client'
 
-import TextInput from "../components/TextInput";
-import Button from "../components/Button";
-import Link from "next/link";
-import axios from "axios";
-import config from "../config.json";
-import React, { useContext } from "react";
-import { useRouter } from "next/navigation";
-import Validator from "../utilities/inputValidator";
-import LoginConstants from "../constants/loginConstants";
-import { UserContext } from "../context/userContext";
-import { useCookies } from "react-cookie";
-import { UserAuthenticationResponse } from "../interfaces/UserAuthenticationResponse";
+import TextInput from '../components/TextInput'
+import Button from '../components/Button'
+import Link from 'next/link'
+import axios from 'axios'
+import config from '../config.json'
+import React, { useContext } from 'react'
+import { useRouter } from 'next/navigation'
+import { isValidEmail, isValidName, isValidPassword, isEmptyString } from '../utilities/inputValidator'
+import { firstNameError, lastNameError, emailError, passwordError } from '../constants/loginConstants'
+import { UserContext } from '../context/userContext'
+import { useCookies } from 'react-cookie'
+import { type UserAuthenticationResponse } from '../interfaces/UserAuthenticationResponse'
 
-export default function SignUp() {
+const SignUp = (): React.JSX.Element => {
+  const [firstName, setFirstName] = React.useState('')
+  const [lastName, setLastName] = React.useState('')
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+  const [confirmPassword, setConfirmPassword] = React.useState('')
+  const [error, setError] = React.useState('')
+  const [, setCookie] = useCookies(['user'])
 
-    const [firstName, setFirstName] = React.useState("");
-    const [lastName, setLastName] = React.useState("");
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
-    const [confirmPassword, setConfirmPassword] = React.useState("");
-    const [error, setError] = React.useState("");
-    const [ cookies, setCookie ] = useCookies(['user']);
-    
-    const router = useRouter();
-    const userContext = useContext(UserContext);
+  const router = useRouter()
+  const userContext = useContext(UserContext)
 
-    const signUpHandler = async () => {
-        if (error === "" && isValidInputs()) {
-            const res = await axios
-            .post(config["auth-server-base"] + config["signup-endpoint"],
-                {
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    password: password,
-                },
-                {
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true
-                }
-            )
-            .then((response) => {
-                console.log(`Received: ${JSON.stringify(response)}`);   
-                const responseData: UserAuthenticationResponse = response.data;
-                userContext?.setUser({
-                    id: Number(responseData.id),
-                    firstName,
-                    lastName,
-                    email: responseData.email,
-                });
+  const signUpHandler = async (): Promise<void> => {
+    if (error === '' && isValidInputs()) {
+      await axios
+        .post(config['auth-server-base'] + config['signup-endpoint'],
+          {
+            firstName,
+            lastName,
+            email,
+            password
+          },
+          {
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json'
+            },
+            withCredentials: true
+          }
+        )
+        .then((response) => {
+          console.log(`Received: ${JSON.stringify(response)}`)
+          const responseData: UserAuthenticationResponse = response.data
+          userContext?.setUser({
+            id: Number(responseData.id),
+            firstName,
+            lastName,
+            email: responseData.email
+          })
 
-                userContext?.setLoggedIn(true);
-                setCookie('user', responseData.id);
-                
-                router.push("/home");
-            }).catch((error) => {
-                console.log(`Error: ${JSON.stringify(error)}`);
-            })
-        }
+          userContext?.setLoggedIn(true)
+          setCookie('user', responseData.id)
+
+          router.push('/home')
+        }).catch((error) => {
+          console.log(`Error: ${JSON.stringify(error)}`)
+        })
     }
+  }
 
-    const firstNameChange = (name: string): void => {
-        setFirstName(name);
-        !Validator.isValidName(name) ? setError(LoginConstants.firstNameError) : setError("");
+  const firstNameChange = (name: string): void => {
+    setFirstName(name)
+    !isValidName(name) ? setError(firstNameError) : setError('')
+  }
+
+  const lastNameChange = (name: string): void => {
+    setLastName(name)
+    !isValidName(name) ? setError(lastNameError) : setError('')
+  }
+
+  const emailChange = (emailInput: string): void => {
+    setEmail(emailInput)
+    !isValidEmail(emailInput) ? setError(emailError) : setError('')
+  }
+
+  const passwordChange = (passwordInput: string): void => {
+    setPassword(passwordInput)
+    !isValidPassword(passwordInput) ? setError(passwordError) : setError('')
+  }
+
+  const confirmPasswordChange = (passwordInput: string): void => {
+    setConfirmPassword(passwordInput)
+    !(password === passwordInput) ? setError('Passwords do not match') : setError('')
+  }
+
+  const isValidInputs = (): boolean => {
+    if (!isEmptyString(firstName) &&
+            !isEmptyString(lastName) &&
+            !isEmptyString(email) &&
+            !isEmptyString(password) &&
+            !isEmptyString(confirmPassword)
+    ) {
+      return true
     }
+    setError('Please enter all the fields')
+    return false
+  }
 
-    const lastNameChange = (name: string): void => {
-        setLastName(name);
-        !Validator.isValidName(name) ? setError(LoginConstants.lastNameError) : setError("");
-    }
-
-    const emailChange = (emailInput: string): void => {
-        setEmail(emailInput);
-        !Validator.isValidEmail(emailInput) ? setError(LoginConstants.emailError) : setError("");
-    }
-
-    const passwordChange = (passwordInput: string): void => {
-        setPassword(passwordInput);
-        !Validator.isValidPassword(passwordInput) ? setError(LoginConstants.passwordError) : setError("");
-    }
-
-    const confirmPasswordChange = (passwordInput: string): void => {
-        setConfirmPassword(passwordInput);
-        !(password === passwordInput) ? setError("Passwords do not match") : setError("");
-    }
-
-    const isValidInputs = (): boolean => {
-        if (!Validator.isEmptyString(firstName) && 
-            !Validator.isEmptyString(lastName) &&
-            !Validator.isEmptyString(email)  &&
-            !Validator.isEmptyString(password) &&
-            !Validator.isEmptyString(confirmPassword)
-        ) {
-            return true;
-        }
-        setError("Please enter all the fields");
-        return false;
-    }
-
-    return (
+  return (
         <div className="flex items-center h-screen justify-center bg-blue">
             <div className="flex text-base flex-1 sm:mx-0 lg:mx-10 xl:mx-20 2xl:mx-10 justify-center">
                 <div className="max-w-xl bg-blue-darkest flex-1 flex flex-col gap-y-8 pt-20 items-center rounded-l-3xl sm:rounded-r-3xl md:rounded-r-3xl">
@@ -141,5 +140,7 @@ export default function SignUp() {
                 </div>
             </div>
         </div>
-    )
+  )
 }
+
+export default SignUp

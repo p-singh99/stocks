@@ -1,46 +1,45 @@
-import { useContext } from "react"
-import { 
-    IconButton, 
-    Flex, 
-    Heading, 
-    Spacer, 
-    HStack, 
-    Avatar, 
-    Menu, 
-    MenuButton,
-    MenuList,
-    MenuItem,
-    VStack, 
-    Text,
-    Box,
-} from "@chakra-ui/react"
-import { BellIcon, HamburgerIcon } from "@chakra-ui/icons"
-import { FiChevronDown } from "react-icons/fi"
-import Search from "../Search"
-import { ProfileItems } from "./profileItems"
-import { UserContext } from "../../context/userContext"
+import React, { useContext } from 'react'
+import {
+  IconButton,
+  Flex,
+  Heading,
+  Spacer,
+  HStack,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  VStack,
+  Text,
+  Box
+} from '@chakra-ui/react'
+import { BellIcon, HamburgerIcon } from '@chakra-ui/icons'
+import { FiChevronDown } from 'react-icons/fi'
+import Search from '../Search'
+import { ProfileItems } from './profileItems'
+import { UserContext } from '../../context/userContext'
 
 interface HeaderProps {
-    sidebarToggle: Function,
+  sidebarToggle: (toggle: boolean) => void
 }
 
-export default function Header({ sidebarToggle }: HeaderProps) {
+const Header = ({ sidebarToggle }: HeaderProps): React.JSX.Element => {
+  const userContext = useContext(UserContext)
 
-    const userContext = useContext(UserContext);
+  const profileItems = Object.values(ProfileItems)
+  console.log(profileItems)
 
-    const profileItems = Object.values(ProfileItems);
-    console.log(profileItems);
-
-    return (
+  return (
         <Flex as='nav' p='0.5em' alignItems='center' bg='#000517' gap='1em'>
-            <IconButton 
-                size='md' 
-                aria-label='open menu' 
-                icon={<HamburgerIcon/>} 
+            <IconButton
+                size='md'
+                aria-label='open menu'
+                icon={<HamburgerIcon/>}
                 colorScheme="white"
-                _hover={{ bg: 'gray.900' }} 
+                _hover={{ bg: 'gray.900' }}
                 borderRadius='xl'
-                onClick={() => {sidebarToggle(true)}}
+                onClick={() => { sidebarToggle(true) }}
             />
             <Heading size='md'>Page Title</Heading>
 
@@ -49,12 +48,12 @@ export default function Header({ sidebarToggle }: HeaderProps) {
             <Spacer/>
 
             <HStack>
-                <IconButton 
-                    size='md' 
-                    aria-label='open menu' 
-                    icon={<BellIcon/>} 
+                <IconButton
+                    size='md'
+                    aria-label='open menu'
+                    icon={<BellIcon/>}
                     colorScheme="white"
-                    _hover={{ bg: 'gray.900' }} 
+                    _hover={{ bg: 'gray.900' }}
                     borderRadius='xl'
                 />
                 <Menu>
@@ -80,17 +79,19 @@ export default function Header({ sidebarToggle }: HeaderProps) {
                         borderRadius='xl'
                         >
                         {profileItems.map((value, index) => {
-                            return(
-                                <MenuItem 
-                                    key={value} 
+                          return (
+                                <MenuItem
+                                    key={value}
                                     bg='bg.700'
                                     _hover={{ bg: 'blue.300' }} >
                                         {value}
                                 </MenuItem>)
-                            })}
+                        })}
                     </MenuList>
                 </Menu>
             </HStack>
         </Flex>
-    )
+  )
 }
+
+export default Header

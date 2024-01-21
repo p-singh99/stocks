@@ -1,28 +1,28 @@
 'use client'
 
-import { useState } from 'react';
+import React, { useState } from 'react'
 
-import Header from "../components/header/Header";
-import Sidebar from '../components/sidebar/Sidebar';
+import Header from '../components/header/Header'
+import Sidebar from '../components/sidebar/Sidebar'
 
+const HomeLayout = ({
+  children
+}: {
+  children: React.ReactNode
+}): React.JSX.Element => {
+  const [isSidebarOpen, setSidebarOpen] = useState(false)
 
-export default function HomeLayout({
-    children,
-  }: {
-    children: React.ReactNode
-  }) {
+  const onSidebarClose = (): void => {
+    setSidebarOpen(false)
+  }
 
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-    const onSidebarClose = () => {
-        setSidebarOpen(false);
-    }
-
-    return (
+  return (
         <>
             <Header sidebarToggle={setSidebarOpen}/>
             <Sidebar isOpen={isSidebarOpen} onClose={onSidebarClose} />
             {children}
         </>
-    )
-  }
+  )
+}
+
+export default HomeLayout

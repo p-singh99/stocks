@@ -1,34 +1,31 @@
-'use client';
+'use client'
 
-import React, { createContext, useContext, Dispatch, useState } from "react";
-import { UserContextType } from "../types/UserContextType";
-import User from "../interfaces/User";
+import React, { createContext, useState } from 'react'
+import { type UserContextType } from '../types/UserContextType'
 
 interface Props {
-    children: React.ReactNode,
+  children: React.ReactNode
 }
 
-export const UserContext = createContext<UserContextType | null>(null);
+export const UserContext = createContext<UserContextType | null>(null)
 
 const UserProvider: React.FC<Props> = ({ children }: Props) => {
+  const [user, setUser] = useState(
+    {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      email: ''
+    }
+  )
 
-    const [ user, setUser ] = useState(
-        {
-            id: 0,
-            firstName: "",
-            lastName: "",
-            email: ""
-        }
-    );
+  const [isLoggedIn, setLoggedIn] = useState(false)
 
-    const [ isLoggedIn, setLoggedIn ] = useState(false);
-
-    return (
+  return (
         <UserContext.Provider value={{ isLoggedIn, user, setUser, setLoggedIn }}>
             { children }
         </UserContext.Provider>
-    );
-
+  )
 }
 
-export default UserProvider;
+export default UserProvider

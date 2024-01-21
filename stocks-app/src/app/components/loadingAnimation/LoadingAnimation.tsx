@@ -1,12 +1,15 @@
-import './LoadingAnimation.css';
+import React from 'react'
+import './LoadingAnimation.css'
 
-export default function LoadingAnimation() {
-    return (
+const LoadingAnimation = (): React.JSX.Element => {
+  return (
         <div className="lds-ring">
             <div></div>
             <div></div>
             <div></div>
             <div></div>
         </div>
-    )
-}   
+  )
+}
+
+export default LoadingAnimation

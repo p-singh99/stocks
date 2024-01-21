@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -12,31 +13,30 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Stocks App',
-  description: 'Keep track of your stocks portfolio',
+  description: 'Keep track of your stocks portfolio'
 }
 
-export default function RootLayout({
-  children,
+const RootLayout = ({
+  children
 }: {
   children: React.ReactNode
-}) {
-
+}): React.JSX.Element => {
   const theme = extendTheme({
     colors: {
       blue: {
         300: '#6788ff',
         700: '#141f45',
-        900: '#141f45',
+        900: '#141f45'
       }
     }
-  });
+  })
 
   return (
     <html lang="en">
       <Head>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
       </Head>
-      <body className={inter.className + " bg-blue-darkest text-white"}>
+      <body className={inter.className + ' bg-blue-darkest text-white'}>
         <ChakraProvider theme={theme}>
           <CookiesProvider>
             <UserProvider>
@@ -48,3 +48,5 @@ export default function RootLayout({
     </html>
   )
 }
+
+export default RootLayout
