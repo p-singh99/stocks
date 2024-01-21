@@ -10,13 +10,8 @@ import { useRouter } from "next/navigation";
 import Validator from "../utilities/inputValidator";
 import LoginConstants from "../constants/loginConstants";
 import { UserContext } from "../context/userContext";
-import User from "../interfaces/User";
-
-interface SignupResponseData {
-    userId: number,
-    email: string,
-    token: string,
-}
+import { useCookies } from "react-cookie";
+import { UserAuthenticationResponse } from "../interfaces/UserAuthenticationResponse";
 
 export default function SignUp() {
 
@@ -26,6 +21,7 @@ export default function SignUp() {
     const [password, setPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
     const [error, setError] = React.useState("");
+    const [ cookies, setCookie ] = useCookies(['user']);
     
     const router = useRouter();
     const userContext = useContext(UserContext);
@@ -44,21 +40,23 @@ export default function SignUp() {
                     headers: {
                         Accept: "application/json",
                         "Content-Type": "application/json",
-                    }
+                    },
+                    withCredentials: true
                 }
             )
             .then((response) => {
                 console.log(`Received: ${JSON.stringify(response)}`);   
-                const responseData: SignupResponseData = response.data;
+                const responseData: UserAuthenticationResponse = response.data;
                 userContext?.setUser({
-                    id: Number(responseData.userId),
+                    id: Number(responseData.id),
                     firstName,
                     lastName,
                     email: responseData.email,
                 });
 
                 userContext?.setLoggedIn(true);
-
+                setCookie('user', responseData.id);
+                
                 router.push("/home");
             }).catch((error) => {
                 console.log(`Error: ${JSON.stringify(error)}`);

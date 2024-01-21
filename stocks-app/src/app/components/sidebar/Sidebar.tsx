@@ -8,8 +8,9 @@ import {
     DrawerBody, 
     VStack,
     Divider,
+    Stack,
 } from "@chakra-ui/react";
-import { Pages } from "./pages";
+import { Pages, PageIcons } from "./pages";
 
 interface SidebarProps {
     isOpen: boolean,
@@ -21,15 +22,14 @@ const SidebarContent = () => {
     const sidebarItems = Object.values(Pages);
 
     return (
-        <VStack spacing='1em' height='100%' justifyContent='center'>
+        <VStack spacing='1em' height='100%' justifyContent='center' alignItems="left">
             {sidebarItems.map((item) => {
             return (
-                <Button w='100%' bg='none' color='white' _hover={{ bg: 'blue.300' }}>
+                <Button w='100%' bg='none' color='white' _hover={{ bg: 'blue.300' }} textAlign={"left"}>
                     {item}
                 </Button>
             )})}
-        </VStack>
-        
+        </VStack>   
     )
 }
 
@@ -44,7 +44,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <DrawerContent bg='blue.700'>
                     <DrawerCloseButton />
                     <DrawerHeader>Stocks</DrawerHeader>
-                    <DrawerBody>
+                    <DrawerBody alignItems="baseline">
                         <SidebarContent />
                     </DrawerBody>
                 </DrawerContent>

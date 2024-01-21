@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google'
 import Head from 'next/head'
 import UserProvider from './context/userContext'
 import { ChakraProvider, extendTheme } from '@chakra-ui/react'
+import { CookiesProvider } from 'react-cookie'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,9 +38,11 @@ export default function RootLayout({
       </Head>
       <body className={inter.className + " bg-blue-darkest text-white"}>
         <ChakraProvider theme={theme}>
-          <UserProvider>
-            {children}
-          </UserProvider>
+          <CookiesProvider>
+            <UserProvider>
+              {children}
+            </UserProvider>
+          </CookiesProvider>
         </ChakraProvider>
       </body>
     </html>

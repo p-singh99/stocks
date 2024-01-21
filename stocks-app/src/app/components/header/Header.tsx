@@ -1,3 +1,4 @@
+import { useContext } from "react"
 import { 
     IconButton, 
     Flex, 
@@ -16,13 +17,16 @@ import {
 import { BellIcon, HamburgerIcon } from "@chakra-ui/icons"
 import { FiChevronDown } from "react-icons/fi"
 import Search from "../Search"
-import { ProfileItems } from "./profileItems";
+import { ProfileItems } from "./profileItems"
+import { UserContext } from "../../context/userContext"
 
 interface HeaderProps {
     sidebarToggle: Function,
 }
 
 export default function Header({ sidebarToggle }: HeaderProps) {
+
+    const userContext = useContext(UserContext);
 
     const profileItems = Object.values(ProfileItems);
     console.log(profileItems);
@@ -62,7 +66,7 @@ export default function Header({ sidebarToggle }: HeaderProps) {
                                     alignItems="flex-start"
                                     spacing="1px"
                                     ml="2">
-                                    <Text fontSize="sm">Justina Clark</Text>
+                                    <Text fontSize="sm">{userContext?.user.firstName} {userContext?.user.lastName}</Text>
                                 </VStack>
                                 <Box display={{ base: 'none', md: 'flex' }}>
                                     <FiChevronDown />

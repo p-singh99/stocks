@@ -1,16 +1,27 @@
 'use client'
 
+import { StatusCodes } from "http-status-codes";
 import Image from "next/image";
 import Logo from "../assets/images/logo.svg";
 import TextInput from "../components/TextInput";
 import Button from "../components/Button";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import Validator from "../utilities/inputValidator";
 import LoginConstants from "../constants/loginConstants";
 import axios from "axios";
 import config from "../config.json";
 import { useRouter } from "next/navigation";
+import { UserContext } from "../context/userContext";
+import { useCookies } from "react-cookie";
+import { UserAuthenticationResponse } from "../interfaces/UserAuthenticationResponse";
+
+interface loginResponse {
+    userId: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+}
 
 export default function Login() {
 
@@ -18,6 +29,8 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    const userContext = useContext(UserContext);
+    const [ cookies, setCookie ] = useCookies(['user']);
 
     const emailHandler = (email: string): void => {
         setEmail(email);
@@ -46,10 +59,29 @@ export default function Login() {
                         "Content-Type": "Application/json",
                     },
                     withCredentials: true
-                }).then(() => {
-                    router.push("/home");
+                }).then((response) => {
+                    if (response.status == StatusCodes.OK) {
+                        const responseData: UserAuthenticationResponse = response.data;
+                        userContext?.setUser({
+                            id: Number(responseData.id),
+                            firstName: responseData.firstName,
+                            lastName: responseData.lastName,
+                            email: responseData.email,
+                        });
+
+                        userContext?.setLoggedIn(true);
+                        setCookie('user', responseData.id);
+
+                        router.push("/home");
+                    }
                 }).catch((error) => {
-                    console.log(`Error during login: ${error}`);
+                    if (error.response.status == StatusCodes.NOT_FOUND) {
+                        setError(LoginConstants.userNotFoundError);
+                    } else if (error.response.status == StatusCodes.UNAUTHORIZED) {
+                        setError(LoginConstants.incorrectPasswordError);
+                    } else if (!error.status) {
+                        setError(LoginConstants.networkError);
+                    }
                 })
         }
     }

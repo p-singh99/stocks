@@ -50,6 +50,25 @@ public class RefreshTokenService {
         return token;
     }
 
+    public boolean verifySession(int userId) {
+        RefreshToken token = refreshTokenRepository.findByUserId(userId);
+        if (token != null) {
+            try {
+                verifyToken(token);
+            } catch (RefreshTokenExpiredException e) {
+                deleteByUserId(userId);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public RefreshToken getRefreshToken(int userID) {
+        RefreshToken token = refreshTokenRepository.findByUserId(userID);
+        return token;
+    }
+
     @Transactional
     public int deleteByUserId(int userId) {
         return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());

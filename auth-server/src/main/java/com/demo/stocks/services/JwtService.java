@@ -49,7 +49,7 @@ public class JwtService {
                 .setExpiration(new Date(issueTime.getTime() + this.jwtExpiry))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact());
-        cookie.setMaxAge(jwtExpiry);
+        cookie.setMaxAge(jwtExpiry / 1000);
 //        cookie.setSecure(true);
         cookie.setHttpOnly(true);
         return cookie;

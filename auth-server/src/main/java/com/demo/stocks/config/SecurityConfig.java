@@ -56,7 +56,7 @@ public class SecurityConfig {
     @Autowired
     private UserRepository repository;
 
-    private static final String[] AUTH_DISABLED = {"/auth/**", "/error"};
+    private static final String[] AUTH_DISABLED = {"/auth/**", "/error", "/v2/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
