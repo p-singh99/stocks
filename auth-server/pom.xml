@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.demo</groupId>
-	<artifactId>auth-server</artifactId>
+	<artifactId>stocks-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>stocks</name>
 	<description>Manage your personal stock portfolio.</description>
