@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation'
 import { isValidEmail, isValidName, isValidPassword, isEmptyString } from '../utilities/inputValidator'
 import { firstNameError, lastNameError, emailError, passwordError } from '../constants/loginConstants'
 import { UserContext } from '../context/userContext'
-import { useCookies } from 'react-cookie'
 import { type UserAuthenticationResponse } from '../interfaces/UserAuthenticationResponse'
 
 const SignUp = (): React.JSX.Element => {
@@ -20,7 +19,6 @@ const SignUp = (): React.JSX.Element => {
   const [password, setPassword] = React.useState('')
   const [confirmPassword, setConfirmPassword] = React.useState('')
   const [error, setError] = React.useState('')
-  const [, setCookie] = useCookies(['user'])
 
   const router = useRouter()
   const userContext = useContext(UserContext)
@@ -54,8 +52,6 @@ const SignUp = (): React.JSX.Element => {
           })
 
           userContext?.setLoggedIn(true)
-          setCookie('user', responseData.id)
-
           router.push('/home')
         }).catch((error) => {
           console.log(`Error: ${JSON.stringify(error)}`)

@@ -6,12 +6,10 @@ import { StatusCodes } from 'http-status-codes'
 import config from './config.json'
 import { useRouter } from 'next/navigation'
 import { UserContext } from './context/userContext'
-import { useCookies } from 'react-cookie'
 import { type UserAuthenticationResponse } from './interfaces/UserAuthenticationResponse'
 
 const Home = (): React.JSX.Element => {
   const { push } = useRouter()
-  const [cookies] = useCookies(['user'])
   const userContext = useContext(UserContext)
 
   useEffect(() => {
@@ -22,9 +20,7 @@ const Home = (): React.JSX.Element => {
     await axios
       .post(
         config['auth-server-base'] + config['validate-session'],
-        {
-          userId: cookies.user
-        },
+        {},
         {
           headers: {
             Accept: 'application/json',

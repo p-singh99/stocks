@@ -14,7 +14,6 @@ import axios from 'axios'
 import config from '../config.json'
 import { useRouter } from 'next/navigation'
 import { UserContext } from '../context/userContext'
-import { useCookies } from 'react-cookie'
 import { type UserAuthenticationResponse } from '../interfaces/UserAuthenticationResponse'
 
 const Login = (): React.JSX.Element => {
@@ -23,7 +22,6 @@ const Login = (): React.JSX.Element => {
   const [password, setPassword] = useState('')
   const router = useRouter()
   const userContext = useContext(UserContext)
-  const [, setCookie] = useCookies(['user'])
 
   const emailHandler = (email: string): void => {
     setEmail(email)
@@ -63,7 +61,6 @@ const Login = (): React.JSX.Element => {
             })
 
             userContext?.setLoggedIn(true)
-            setCookie('user', responseData.id)
 
             router.push('/home')
           }
