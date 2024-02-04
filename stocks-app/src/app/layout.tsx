@@ -11,7 +11,7 @@ import { CookiesProvider } from 'react-cookie'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: 'Stocks App',
   description: 'Keep track of your stocks portfolio'
 }

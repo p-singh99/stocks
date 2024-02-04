@@ -17,6 +17,7 @@ const Home = (): React.JSX.Element => {
   }, [])
 
   const validateSession = async (): Promise<void> => {
+    console.log("Inside Validate");
     await axios
       .post(
         config['auth-server-base'] + config['validate-session'],

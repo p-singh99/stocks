@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -38,8 +40,17 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private RefreshTokenService refreshTokenService;
 
+    private final RequestMatcher signupPath = new AntPathRequestMatcher("/auth/signup");
+
+    private final RequestMatcher loginPath = new AntPathRequestMatcher("/auth");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        if (this.signupPath.matches(request) || this.loginPath.matches(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         Cookie jwtCookie = null;
 
@@ -61,6 +72,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 //                    this.resetAuthenticationAfterRequest();
+                    filterChain.doFilter(request, response);
                 } else {
                     // Check if JWT token can be refreshed.
                     UserDTO user = null;
@@ -74,6 +86,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                             this.resetAuthenticationAfterRequest();
+                            filterChain.doFilter(request, response);
                         } else {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         }
@@ -87,7 +100,6 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
-        filterChain.doFilter(request, response);
     }
 
     private void resetAuthenticationAfterRequest() {
